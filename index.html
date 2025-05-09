@@ -107,6 +107,8 @@
     </script>
     <script>
         const infoBar = document.getElementById('infoBar');
+
+        // Function to get the current time
         const updateTime = () => {
             const now = new Date();
             return now.toLocaleTimeString();
@@ -137,7 +139,7 @@
                         <span class="icon">📍</span> Location: ${location} 
                         <span class="icon"><img src="${weatherIconUrl}" alt="${weather}" style="vertical-align: middle; width: 30px; height: 30px;"></span> 
                         Weather: ${temperature}°C, ${weather} 
-                        <span class="icon">⏰</span> Time: ${updateTime()}
+                        <span class="icon">⏰</span> Time: <span id="liveTime">${updateTime()}</span>
                     `;
                 });
             } catch (error) {
@@ -146,12 +148,11 @@
             }
         };
 
-        // Update time every second
+        // Update the live time every second
         setInterval(() => {
-            const currentText = infoBar.textContent;
-            const timeIndex = currentText.lastIndexOf('| Time:');
-            if (timeIndex !== -1) {
-                infoBar.textContent = currentText.slice(0, timeIndex) + ` | Time: ${updateTime()}`;
+            const liveTimeElement = document.getElementById('liveTime');
+            if (liveTimeElement) {
+                liveTimeElement.textContent = updateTime();
             }
         }, 1000);
 
