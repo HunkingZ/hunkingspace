@@ -104,8 +104,8 @@
 
         // Allow the video to loop naturally without restarting the audio
         video.loop = true;
-
-        // Fetch and display location, weather, and time
+    </script>
+    <script>
         const infoBar = document.getElementById('infoBar');
         const updateTime = () => {
             const now = new Date();
@@ -119,15 +119,26 @@
                     const { latitude, longitude } = position.coords;
 
                     // Fetch weather data using OpenWeatherMap API
-                    const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${openWeatherAPI}`);
+                    const weatherResponse = await fetch(
+                        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${openWeatherAPI}`
+                    );
                     const weatherData = await weatherResponse.json();
 
                     const location = weatherData.name;
                     const temperature = weatherData.main.temp;
                     const weather = weatherData.weather[0].description;
+                    const weatherIcon = weatherData.weather[0].icon; // Get the weather icon code
 
-                    // Update the info bar
-                    infoBar.textContent = `Location: ${location} | Weather: ${temperature}°C, ${weather} | Time: ${updateTime()}`;
+                    // Generate the weather icon URL
+                    const weatherIconUrl = `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
+
+                    // Update the info bar with location, weather, and time
+                    infoBar.innerHTML = `
+                        <span class="icon">📍</span> Location: ${location} 
+                        <span class="icon"><img src="${weatherIconUrl}" alt="${weather}" style="vertical-align: middle; width: 30px; height: 30px;"></span> 
+                        Weather: ${temperature}°C, ${weather} 
+                        <span class="icon">⏰</span> Time: ${updateTime()}
+                    `;
                 });
             } catch (error) {
                 console.error('Failed to fetch location or weather:', error);
