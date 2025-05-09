@@ -13,9 +13,19 @@
             background-color: #000000;
             overflow: hidden; /* Prevent scrollbars */
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             height: 100vh; /* Full height of the viewport */
+        }
+        .info-bar {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            text-align: center;
+            font-size: 1rem;
+            position: absolute;
+            top: 0;
         }
         .player-container {
             position: relative;
@@ -33,8 +43,8 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1 style="display: none;">Hunking Radio</h1> <!-- Hidden header for accessibility -->
+    <header class="info-bar" id="infoBar">
+        Loading location, weather, and time...
     </header>
     <main class="player-container">
         <video id="videoPlayer" autoplay muted loop>
@@ -42,6 +52,7 @@
             Your browser does not support the video tag.
         </video>
     </main>
+    <script src="config.js"></script> <!-- Include the config.js file -->
     <script>
         // Get video and audio elements
         const video = document.getElementById('videoPlayer');
@@ -82,6 +93,48 @@
 
         // Allow the video to loop naturally without restarting the audio
         video.loop = true;
+
+        // Fetch and display location, weather, and time
+        const infoBar = document.getElementById('infoBar');
+        const updateTime = () => {
+            const now = new Date();
+            return now.toLocaleTimeString();
+        };
+
+        const fetchLocationAndWeather = async () => {
+            try {
+                // Fetch location using Geolocation API
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const { latitude, longitude } = position.coords;
+
+                    // Fetch weather data using OpenWeatherMap API
+                    const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${openWeatherAPI}`);
+                    const weatherData = await weatherResponse.json();
+
+                    const location = weatherData.name;
+                    const temperature = weatherData.main.temp;
+                    const weather = weatherData.weather[0].description;
+
+                    // Update the info bar
+                    infoBar.textContent = `Location: ${location} | Weather: ${temperature}°C, ${weather} | Time: ${updateTime()}`;
+                });
+            } catch (error) {
+                console.error('Failed to fetch location or weather:', error);
+                infoBar.textContent = 'Unable to load location or weather.';
+            }
+        };
+
+        // Update time every second
+        setInterval(() => {
+            const currentText = infoBar.textContent;
+            const timeIndex = currentText.lastIndexOf('| Time:');
+            if (timeIndex !== -1) {
+                infoBar.textContent = currentText.slice(0, timeIndex) + ` | Time: ${updateTime()}`;
+            }
+        }, 1000);
+
+        // Fetch location and weather on page load
+        fetchLocationAndWeather();
     </script>
 </body>
 </html>
