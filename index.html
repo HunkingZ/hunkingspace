@@ -19,13 +19,24 @@
         }
         .info-bar {
             width: 100%;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.9));
             color: #ffffff;
             text-align: center;
-            font-size: 1rem;
+            font-size: 1.2rem;
+            font-weight: 500;
             position: absolute;
             top: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        .info-bar span {
+            display: inline-block;
+            margin: 0 10px;
+        }
+        .info-bar span.icon {
+            font-size: 1.5rem;
+            vertical-align: middle;
         }
         .player-container {
             position: relative;
