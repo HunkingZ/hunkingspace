@@ -35,6 +35,11 @@
                         <span class="retro-icon">▸▸</span>
                     </button>
                     
+                    <div class="volume-control">
+                        <span class="retro-icon">🔊</span>
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                    </div>
+
                     <!-- Segmented progress bar -->
                     <div class="progress-container" id="progressContainer">
                         <!-- Progress segments will be added by JavaScript -->
@@ -56,7 +61,19 @@
         const audio = new Audio('audios/rainy-lofi1.mp3');
         const playPauseButton = document.getElementById('playPauseButton');
         const progressContainer = document.getElementById('progressContainer');
+        const volumeSlider = document.getElementById('volumeSlider');
         let isPlaying = false;
+
+        // Volume control
+        volumeSlider.addEventListener('input', () => {
+            const volume = volumeSlider.value / 100;
+            audio.volume = volume;
+            video.volume = volume;
+        });
+
+        // Initialize volume
+        audio.volume = volumeSlider.value / 100;
+        video.volume = volumeSlider.value / 100;
 
         // Create progress bar segments
         const SEGMENTS = 15;
