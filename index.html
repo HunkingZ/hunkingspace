@@ -9,7 +9,9 @@
 </head>
 <body>
     <header class="info-bar" id="infoBar">
-        Loading location, weather, and time...
+        <span class="icon">⌚</span><span id="liveTime">--:--</span>
+        <span class="icon">☂</span><span id="weatherInfo">--°C</span>
+        <span class="icon">◈</span><span id="locationInfo">loading...</span>
     </header>
     
     <main class="player-container">
@@ -111,11 +113,6 @@
         // Weather and time info
         const infoBar = document.getElementById('infoBar');
 
-        const updateTime = () => {
-            const now = new Date();
-            return now.toLocaleTimeString();
-        };
-
         const fetchLocationAndWeather = async () => {
             try {
                 navigator.geolocation.getCurrentPosition(async (position) => {
@@ -126,31 +123,29 @@
                     const weatherData = await weatherResponse.json();
 
                     const location = weatherData.name;
-                    const temperature = weatherData.main.temp;
+                    const temperature = Math.round(weatherData.main.temp);
                     const weather = weatherData.weather[0].description;
-                    const weatherIcon = weatherData.weather[0].icon;
-                    const weatherIconUrl = `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
 
-                    infoBar.innerHTML = `
-                        <span class="icon">📍</span> Location: ${location} 
-                        <span class="icon"><img src="${weatherIconUrl}" alt="${weather}" style="vertical-align: middle; width: 30px; height: 30px;"></span> 
-                        Weather: ${temperature}°C, ${weather} 
-                        <span class="icon">⏰</span> Time: <span id="liveTime">${updateTime()}</span>
-                    `;
+                    document.getElementById('weatherInfo').textContent = `${temperature}°C`;
+                    document.getElementById('locationInfo').textContent = location;
                 });
             } catch (error) {
                 console.error('Failed to fetch location or weather:', error);
-                infoBar.textContent = 'Unable to load location or weather.';
+                document.getElementById('weatherInfo').textContent = '--°C';
+                document.getElementById('locationInfo').textContent = 'unavailable';
             }
         };
 
-        setInterval(() => {
-            const liveTimeElement = document.getElementById('liveTime');
-            if (liveTimeElement) {
-                liveTimeElement.textContent = updateTime();
-            }
-        }, 1000);
+        // Update time every second
+        const updateTime = () => {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('liveTime').textContent = `${hours}:${minutes}`;
+        };
 
+        setInterval(updateTime, 1000);
+        updateTime();
         fetchLocationAndWeather();
     </script>
 </body>
