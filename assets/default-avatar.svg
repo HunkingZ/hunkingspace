@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .avatar {
+            fill: #ff00ff;
+        }
+        .face {
+            fill: none;
+            stroke: #00ffff;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+    </style>
+    
+    <!-- Background circle -->
+    <circle class="avatar" cx="20" cy="20" r="20" opacity="0.5"/>
+    
+    <!-- Simple face -->
+    <g class="face">
+        <circle cx="20" cy="20" r="15"/>
+        <circle cx="15" cy="17" r="2"/>
+        <circle cx="25" cy="17" r="2"/>
+        <path d="M15,25 Q20,28 25,25"/>
+    </g>
+</svg> 

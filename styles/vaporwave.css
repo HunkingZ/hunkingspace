@@ -1,0 +1,220 @@
+:root {
+    --primary-color: #ff00ff;
+    --secondary-color: #00ffff;
+    --background-color: #000000;
+    --text-color: #ffffff;
+    --scanline-opacity: 0.15;
+}
+
+body {
+    font-family: 'VT323', monospace;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Scanline effect */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, var(--scanline-opacity)),
+        rgba(0, 0, 0, var(--scanline-opacity)) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 999;
+}
+
+.player-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background: linear-gradient(
+        180deg,
+        #000000 0%,
+        #1a0033 40%,
+        #330066 100%
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#videoPlayer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    mix-blend-mode: screen;
+    z-index: 1;
+}
+
+/* Overlay gradient for video */
+.player-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.4) 0%,
+        rgba(26, 0, 51, 0.6) 40%,
+        rgba(51, 0, 102, 0.8) 100%
+    );
+    z-index: 2;
+}
+
+.palm-trees {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40vh;
+    background-image: url('../assets/palm-trees.svg');
+    background-repeat: repeat-x;
+    background-position: bottom;
+    background-size: auto 100%;
+    z-index: 5;
+}
+
+.terrain {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30vh;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 0, 255, 0.2) 0%,
+        rgba(255, 0, 255, 0.4) 50%,
+        rgba(255, 0, 255, 0.6) 100%
+    );
+    z-index: 4;
+}
+
+.stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(white 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: twinkle 1s infinite alternate;
+    z-index: 3;
+}
+
+.sun {
+    position: absolute;
+    top: 10%;
+    right: 10%;
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(45deg, #ff1493, #ff69b4);
+    border-radius: 50%;
+    box-shadow: 0 0 50px #ff1493;
+    z-index: 3;
+}
+
+.controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+}
+
+.control-item {
+    color: var(--text-color);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-list {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+}
+
+.player-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 10;
+}
+
+.control-button {
+    color: var(--text-color);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.station-info {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    color: var(--text-color);
+    font-size: 14px;
+    z-index: 10;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Retro text effect */
+.retro-text {
+    text-shadow: 2px 2px var(--primary-color),
+                 -2px -2px var(--secondary-color);
+    letter-spacing: 2px;
+}
+
+/* Progress bar styling */
+.progress-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress {
+    width: 50%;
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.1s linear;
+} 

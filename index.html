@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Player</title>
     <link rel="stylesheet" href="styles/general.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -62,48 +63,153 @@
             <source src="videos/lofi1.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
+
+        <!-- Progress bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Controls overlay -->
+        <div class="controls-overlay">
+            <div class="track-info">
+                <div class="track-title">Chillhop Radio</div>
+                <div class="track-artist">jazzy & lofi hip hop beats</div>
+            </div>
+
+            <div class="playback-controls">
+                <button class="control-button" id="prevButton">
+                    <i class="fas fa-step-backward"></i>
+                </button>
+                <button class="control-button" id="playPauseButton">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="control-button" id="nextButton">
+                    <i class="fas fa-step-forward"></i>
+                </button>
+                
+                <div class="time-display">
+                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                </div>
+            </div>
+
+            <div class="volume-control">
+                <button class="control-button" id="muteButton">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+            </div>
+        </div>
     </main>
     <script src="config.js"></script> <!-- Include the config.js file -->
     <script>
         // Get video and audio elements
         const video = document.getElementById('videoPlayer');
         const audio = new Audio('audios/rainy-lofi1.mp3');
+        const playPauseButton = document.getElementById('playPauseButton');
+        const playPauseIcon = playPauseButton.querySelector('i');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const muteButton = document.getElementById('muteButton');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const durationDisplay = document.getElementById('duration');
+        let isPlaying = false;
 
-        // Ensure audio is allowed to play (fix autoplay restrictions)
-        const enableAudio = () => {
-            audio.play().catch(error => {
-                console.error('Audio playback failed:', error);
-            });
-            document.removeEventListener('click', enableAudio);
-        };
+        // Initialize volume
+        audio.volume = volumeSlider.value / 100;
 
-        // Add a user interaction listener to enable audio
-        document.addEventListener('click', enableAudio);
+        // Play/Pause functionality
+        playPauseButton.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                video.pause();
+                playPauseIcon.classList.remove('fa-pause');
+                playPauseIcon.classList.add('fa-play');
+            } else {
+                audio.play().catch(console.error);
+                video.play();
+                playPauseIcon.classList.remove('fa-play');
+                playPauseIcon.classList.add('fa-pause');
+            }
+            isPlaying = !isPlaying;
+        });
 
-        // Play audio when the video starts
-        video.addEventListener('play', () => {
-            if (audio.paused) {
-                audio.play().catch(error => {
-                    console.error('Audio playback failed:', error);
-                });
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value / 100;
+            audio.volume = volume;
+            updateVolumeIcon(volume);
+        });
+
+        // Mute toggle
+        muteButton.addEventListener('click', () => {
+            audio.muted = !audio.muted;
+            if (audio.muted) {
+                muteButton.querySelector('i').className = 'fas fa-volume-mute';
+            } else {
+                updateVolumeIcon(audio.volume);
             }
         });
 
-        // Pause audio when the video pauses
-        video.addEventListener('pause', () => {
-            audio.pause();
+        // Update volume icon based on level
+        function updateVolumeIcon(volume) {
+            const icon = muteButton.querySelector('i');
+            icon.className = 'fas ' + (
+                volume === 0 ? 'fa-volume-mute' :
+                volume < 0.33 ? 'fa-volume-off' :
+                volume < 0.67 ? 'fa-volume-down' :
+                'fa-volume-up'
+            );
+        }
+
+        // Progress bar
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = progress + '%';
+            currentTimeDisplay.textContent = formatTime(audio.currentTime);
         });
 
-        // Restart audio when it finishes
-        audio.addEventListener('ended', () => {
-            audio.currentTime = 0; // Reset audio to the beginning
-            audio.play().catch(error => {
-                console.error('Audio playback failed:', error);
-            });
+        audio.addEventListener('loadedmetadata', () => {
+            durationDisplay.textContent = formatTime(audio.duration);
         });
 
-        // Allow the video to loop naturally without restarting the audio
-        video.loop = true;
+        // Format time in MM:SS
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            seconds = Math.floor(seconds % 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Click on progress bar to seek
+        document.querySelector('.progress-container').addEventListener('click', (e) => {
+            const rect = e.target.getBoundingClientRect();
+            const ratio = (e.clientX - rect.left) / rect.width;
+            const newTime = ratio * audio.duration;
+            audio.currentTime = newTime;
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case ' ':
+                    e.preventDefault();
+                    playPauseButton.click();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    volumeSlider.value = Math.min(100, parseInt(volumeSlider.value) + 5);
+                    volumeSlider.dispatchEvent(new Event('input'));
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    volumeSlider.value = Math.max(0, parseInt(volumeSlider.value) - 5);
+                    volumeSlider.dispatchEvent(new Event('input'));
+                    break;
+                case 'M':
+                case 'm':
+                    muteButton.click();
+                    break;
+            }
+        });
     </script>
     <script>
         const infoBar = document.getElementById('infoBar');
