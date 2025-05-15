@@ -1,10 +1,30 @@
 /* Base styles */
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'VT323', monospace;
     margin: 0;
     padding: 0;
     background-color: #000000;
     color: #ffffff;
+    overflow: hidden;
+}
+
+/* Scanline effect - more subtle now */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 30;
 }
 
 /* Info bar styling */
@@ -41,13 +61,18 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
 /* Video styling */
 video {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
 }
 
 /* Controls overlay */
@@ -56,29 +81,27 @@ video {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 10px 20px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 8px;
     z-index: 20;
 }
 
 /* Track info */
 .track-info {
-    flex: 1;
-    margin-right: 20px;
-}
-
-.track-title {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
     color: #fff;
+    letter-spacing: 1px;
 }
 
-.track-artist {
-    font-size: 0.9rem;
-    color: #aaa;
+.track-title, .track-artist {
+    display: inline;
+    color: #fff;
 }
 
 /* Playback controls */
@@ -93,17 +116,33 @@ video {
     border: none;
     color: white;
     cursor: pointer;
-    padding: 10px;
-    border-radius: 50%;
-    transition: background-color 0.3s;
+    padding: 5px;
+    font-size: 16px;
+    opacity: 0.85;
+    transition: opacity 0.2s;
 }
 
 .control-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 1;
 }
 
-.control-button i {
-    font-size: 24px;
+/* Progress bar */
+.progress-container {
+    width: 200px;
+    height: 10px;
+    display: flex;
+    gap: 2px;
+}
+
+.progress-segment {
+    flex: 1;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.2s ease;
+}
+
+.progress-segment.active {
+    background: rgba(255, 255, 255, 0.85);
 }
 
 /* Volume control */
@@ -111,62 +150,41 @@ video {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: 20px;
 }
 
 .volume-slider {
-    width: 100px;
-    height: 4px;
+    width: 80px;
+    height: 3px;
     -webkit-appearance: none;
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
     outline: none;
 }
 
 .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 12px;
-    height: 12px;
+    width: 8px;
+    height: 8px;
     background: #ffffff;
     border-radius: 50%;
     cursor: pointer;
 }
 
-/* Progress bar */
-.progress-container {
-    position: absolute;
-    bottom: 70px;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    cursor: pointer;
+/* Bottom bar layout */
+.bottom-bar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
-.progress-bar {
-    height: 100%;
-    background: #ffffff;
-    width: 0;
-    transition: width 0.1s linear;
+.left-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* Time display */
-.time-display {
-    font-size: 0.8rem;
-    color: #aaa;
-    margin-left: 15px;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .controls-overlay {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .volume-control {
-        width: 100%;
-        justify-content: center;
-        margin-left: 0;
-    }
+/* Retro icons */
+.retro-icon {
+    font-family: monospace;
+    font-size: 16px;
+    color: white;
 }

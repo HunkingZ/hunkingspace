@@ -5,216 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Player</title>
     <link rel="stylesheet" href="styles/general.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #000000;
-            overflow: hidden; /* Prevent scrollbars */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh; /* Full height of the viewport */
-        }
-        .info-bar {
-            width: 100%;
-            padding: 15px 20px;
-            background: linear-gradient(90deg, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.9));
-            color: #ffffff;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 500;
-            position: absolute;
-            top: 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-        .info-bar span {
-            display: inline-block;
-            margin: 0 10px;
-        }
-        .info-bar span.icon {
-            font-size: 1.5rem;
-            vertical-align: middle;
-        }
-        .player-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        video {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain; /* Ensures the video fits within the container without distortion */
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="info-bar" id="infoBar">
         Loading location, weather, and time...
     </header>
+    
     <main class="player-container">
         <video id="videoPlayer" autoplay muted loop>
             <source src="videos/lofi1.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
 
-        <!-- Progress bar -->
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-
         <!-- Controls overlay -->
         <div class="controls-overlay">
-            <div class="track-info">
-                <div class="track-title">Chillhop Radio</div>
-                <div class="track-artist">jazzy & lofi hip hop beats</div>
-            </div>
-
-            <div class="playback-controls">
-                <button class="control-button" id="prevButton">
-                    <i class="fas fa-step-backward"></i>
-                </button>
-                <button class="control-button" id="playPauseButton">
-                    <i class="fas fa-play"></i>
-                </button>
-                <button class="control-button" id="nextButton">
-                    <i class="fas fa-step-forward"></i>
-                </button>
-                
-                <div class="time-display">
-                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+            <div class="bottom-bar">
+                <div class="left-controls">
+                    <button class="control-button" id="playPauseButton">
+                        <span class="retro-icon">▮▮</span>
+                    </button>
+                    <button class="control-button" id="shuffleButton">
+                        <span class="retro-icon">↯</span>
+                    </button>
+                    <button class="control-button" id="prevButton">
+                        <span class="retro-icon">◂◂</span>
+                    </button>
+                    <button class="control-button" id="nextButton">
+                        <span class="retro-icon">▸▸</span>
+                    </button>
+                    
+                    <!-- Segmented progress bar -->
+                    <div class="progress-container" id="progressContainer">
+                        <!-- Progress segments will be added by JavaScript -->
+                    </div>
                 </div>
-            </div>
 
-            <div class="volume-control">
-                <button class="control-button" id="muteButton">
-                    <i class="fas fa-volume-up"></i>
-                </button>
-                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                <div class="track-info">
+                    <span class="retro-icon">♫</span>
+                    click to change > Chillhop Radio - jazzy & lofi hip hop beats
+                </div>
             </div>
         </div>
     </main>
-    <script src="config.js"></script> <!-- Include the config.js file -->
+
+    <script src="config.js"></script>
     <script>
         // Get video and audio elements
         const video = document.getElementById('videoPlayer');
         const audio = new Audio('audios/rainy-lofi1.mp3');
         const playPauseButton = document.getElementById('playPauseButton');
-        const playPauseIcon = playPauseButton.querySelector('i');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const muteButton = document.getElementById('muteButton');
-        const progressBar = document.getElementById('progressBar');
-        const currentTimeDisplay = document.getElementById('currentTime');
-        const durationDisplay = document.getElementById('duration');
+        const progressContainer = document.getElementById('progressContainer');
         let isPlaying = false;
 
-        // Initialize volume
-        audio.volume = volumeSlider.value / 100;
+        // Create progress bar segments
+        const SEGMENTS = 15;
+        for (let i = 0; i < SEGMENTS; i++) {
+            const segment = document.createElement('div');
+            segment.className = 'progress-segment';
+            progressContainer.appendChild(segment);
+        }
 
         // Play/Pause functionality
         playPauseButton.addEventListener('click', () => {
             if (isPlaying) {
                 audio.pause();
                 video.pause();
-                playPauseIcon.classList.remove('fa-pause');
-                playPauseIcon.classList.add('fa-play');
+                playPauseButton.querySelector('.retro-icon').textContent = '▮▮';
             } else {
                 audio.play().catch(console.error);
                 video.play();
-                playPauseIcon.classList.remove('fa-play');
-                playPauseIcon.classList.add('fa-pause');
+                playPauseButton.querySelector('.retro-icon').textContent = '▶';
             }
             isPlaying = !isPlaying;
         });
 
-        // Volume control
-        volumeSlider.addEventListener('input', (e) => {
-            const volume = e.target.value / 100;
-            audio.volume = volume;
-            updateVolumeIcon(volume);
-        });
-
-        // Mute toggle
-        muteButton.addEventListener('click', () => {
-            audio.muted = !audio.muted;
-            if (audio.muted) {
-                muteButton.querySelector('i').className = 'fas fa-volume-mute';
-            } else {
-                updateVolumeIcon(audio.volume);
-            }
-        });
-
-        // Update volume icon based on level
-        function updateVolumeIcon(volume) {
-            const icon = muteButton.querySelector('i');
-            icon.className = 'fas ' + (
-                volume === 0 ? 'fa-volume-mute' :
-                volume < 0.33 ? 'fa-volume-off' :
-                volume < 0.67 ? 'fa-volume-down' :
-                'fa-volume-up'
-            );
-        }
-
-        // Progress bar
+        // Update progress bar segments
         audio.addEventListener('timeupdate', () => {
-            const progress = (audio.currentTime / audio.duration) * 100;
-            progressBar.style.width = progress + '%';
-            currentTimeDisplay.textContent = formatTime(audio.currentTime);
-        });
-
-        audio.addEventListener('loadedmetadata', () => {
-            durationDisplay.textContent = formatTime(audio.duration);
-        });
-
-        // Format time in MM:SS
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            seconds = Math.floor(seconds % 60);
-            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Click on progress bar to seek
-        document.querySelector('.progress-container').addEventListener('click', (e) => {
-            const rect = e.target.getBoundingClientRect();
-            const ratio = (e.clientX - rect.left) / rect.width;
-            const newTime = ratio * audio.duration;
-            audio.currentTime = newTime;
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case ' ':
-                    e.preventDefault();
-                    playPauseButton.click();
-                    break;
-                case 'ArrowUp':
-                    e.preventDefault();
-                    volumeSlider.value = Math.min(100, parseInt(volumeSlider.value) + 5);
-                    volumeSlider.dispatchEvent(new Event('input'));
-                    break;
-                case 'ArrowDown':
-                    e.preventDefault();
-                    volumeSlider.value = Math.max(0, parseInt(volumeSlider.value) - 5);
-                    volumeSlider.dispatchEvent(new Event('input'));
-                    break;
-                case 'M':
-                case 'm':
-                    muteButton.click();
-                    break;
+            const progress = (audio.currentTime / audio.duration);
+            const activeSegments = Math.floor(progress * SEGMENTS);
+            
+            const segments = progressContainer.children;
+            for (let i = 0; i < segments.length; i++) {
+                segments[i].classList.toggle('active', i < activeSegments);
             }
         });
-    </script>
-    <script>
+
+        // Weather and time info
         const infoBar = document.getElementById('infoBar');
 
-        // Function to get the current time
         const updateTime = () => {
             const now = new Date();
             return now.toLocaleTimeString();
@@ -222,11 +101,8 @@
 
         const fetchLocationAndWeather = async () => {
             try {
-                // Fetch location using Geolocation API
                 navigator.geolocation.getCurrentPosition(async (position) => {
                     const { latitude, longitude } = position.coords;
-
-                    // Fetch weather data using OpenWeatherMap API
                     const weatherResponse = await fetch(
                         `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${openWeatherAPI}`
                     );
@@ -235,12 +111,9 @@
                     const location = weatherData.name;
                     const temperature = weatherData.main.temp;
                     const weather = weatherData.weather[0].description;
-                    const weatherIcon = weatherData.weather[0].icon; // Get the weather icon code
-
-                    // Generate the weather icon URL
+                    const weatherIcon = weatherData.weather[0].icon;
                     const weatherIconUrl = `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
 
-                    // Update the info bar with location, weather, and time
                     infoBar.innerHTML = `
                         <span class="icon">📍</span> Location: ${location} 
                         <span class="icon"><img src="${weatherIconUrl}" alt="${weather}" style="vertical-align: middle; width: 30px; height: 30px;"></span> 
@@ -254,7 +127,6 @@
             }
         };
 
-        // Update the live time every second
         setInterval(() => {
             const liveTimeElement = document.getElementById('liveTime');
             if (liveTimeElement) {
@@ -262,7 +134,6 @@
             }
         }, 1000);
 
-        // Fetch location and weather on page load
         fetchLocationAndWeather();
     </script>
 </body>
